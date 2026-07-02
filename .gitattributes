@@ -1,0 +1,15 @@
+# Нормализация переносов строк
+* text=auto eol=lf
+
+# Swift файлы
+*.swift text diff=swift
+
+# JSON и конфиги
+*.json text
+*.yaml text
+*.yml text
+Package.swift text
+
+# Запрет на слияние для бинарников (на всякий случай)
+*.png binary
+*.jpg binary
