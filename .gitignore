@@ -1,0 +1,30 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Xcode
+DerivedData/
+*.xcodeproj/*
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+*.xcworkspace/*
+!*.xcworkspace/contents.xcworkspacedata
+xcuserdata/
+*.xccheckout
+*.moved-aside
+
+# Swift Package Manager
+.build/
+.swiftpm/xcode/xcuserdata/
+Packages/
+Package.pins
+Package.resolved # Обычно резолв коммитят, но для библиотеки иногда лучше игнорить. Оставь закомменченным, если хочешь коммитить зависимости.
+
+# VS Code (если используешь для свифта)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
