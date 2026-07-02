@@ -163,17 +163,35 @@ public struct SUISwipeToPopModifier: ViewModifier {
         // Если жест завершился, но экран даже не начал двигаться — просто выходим
         guard let axis = lockedAxis, let direction = activeDirection else { return }
         
-        // Считаем финальный сдвиг относительно точки старта
+        // 1. Считаем финальный сдвиг относительно точки старта
         let finalRelativeTranslation: CGFloat
         if axis == .horizontal {
-            finalRelativeTranslation = value.translation.width - activationPoint.width // <--- width
+            finalRelativeTranslation = value.translation.width - activationPoint.width
         } else {
-            finalRelativeTranslation = value.translation.height - activationPoint.height // <--- height
+            finalRelativeTranslation = value.translation.height - activationPoint.height
         }
         
-        let threshold = calculateThreshold()
+        // 2. Переводим в CGPoint и ПРОПУСКАЕМ ЧЕРЕЗ CLAMPING
+        // Это даст нам ТОЧНОЕ визуальное положение экрана в момент отпускания
+        let rawEndOffset = convertToCGPoint(translation: finalRelativeTranslation, axis: axis)
+        let visualEndOffset = clampOffset(rawEndOffset, direction: direction)
         
-        if abs(finalRelativeTranslation) > threshold {
+        // 3. Вычисляем порог срабатывания строго по активной оси
+        let threshold: CGFloat
+        switch axis {
+            case .horizontal: threshold = bounds.width * 0.2
+            case .vertical:   threshold = bounds.height * 0.2
+        }
+        
+        // 4. Оцениваем ВИЗУАЛЬНУЮ дистанцию, а не сырую
+        let visualDistance: CGFloat
+        switch direction {
+            case .right, .left: visualDistance = abs(visualEndOffset.x)
+            case .up, .down:    visualDistance = abs(visualEndOffset.y)
+        }
+        
+        // 5. Принимаем решение на основе того, что видит пользователь
+        if visualDistance > threshold {
             finishPop(currentVM: currentVM, previousVM: previousVM, direction: direction)
         } else {
             cancelPop(currentVM: currentVM, previousVM: previousVM, direction: direction)
