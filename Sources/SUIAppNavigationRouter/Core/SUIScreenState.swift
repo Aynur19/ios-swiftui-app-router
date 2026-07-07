@@ -1,4 +1,4 @@
-public enum SUIScreenState {
+public enum SUIScreenState: Sendable {
     case onInited
     case onAppearing
     case onAppeared

@@ -14,7 +14,8 @@ public struct SUINavigationTransitionSlideStyle: SUINavigationTransitionStyle {
     
     public func transition() -> SUINavigationTransition {
         let centerAnchor = SUIScreenAnchor.center
-        let appearTransition = SUIScreenTransition.slide(from: anchor, to: centerAnchor, bounds: bounds)
+        let appearTransition = SUIScreenTransition
+            .slide(from: anchor, to: centerAnchor, bounds: bounds)
         let disappearTransition = SUIScreenTransition
             .slide(from: centerAnchor, to: anchor.assymmetric(), coef: 0.5, bounds: bounds)
         
@@ -25,7 +26,8 @@ public struct SUINavigationTransitionSlideStyle: SUINavigationTransitionStyle {
         let centerAnchor = SUIScreenAnchor.center
         let appearTransition = SUIScreenTransition
             .slide(from: anchor.assymmetric(), to: centerAnchor, coef: 0.5, bounds: bounds)
-        let disappearTransition = SUIScreenTransition.slide(from: centerAnchor, to: anchor, bounds: bounds)
+        let disappearTransition = SUIScreenTransition
+            .slide(from: centerAnchor, to: anchor, bounds: bounds)
         
         return SUINavigationTransition(appearTransition: appearTransition, disappearTransition: disappearTransition)
     }
