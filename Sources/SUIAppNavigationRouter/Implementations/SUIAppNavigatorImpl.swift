@@ -284,10 +284,9 @@ extension SUIAppNavigatorImpl {
             if screen.id == topScreen.id {
                 // Верхний экран всегда полностью видим и на месте
                 screenStateViewModel(for: screen)?.setOffsetDirectly(.zero)
-                screenStateViewModel(for: screen)?.setOpacityDirectly(1.0)
+                screenStateViewModel(for: screen)?.setVisibilityDirectly(1.0)
             } else {
-                // ВСЕ остальные экраны под ним принудительно прозрачны (даже если анимация слайна забыла сделать opacity: 0)
-                screenStateViewModel(for: screen)?.setOpacityDirectly(0.0)
+                screenStateViewModel(for: screen)?.setVisibilityDirectly(0.0)
             }
         }
     }

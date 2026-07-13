@@ -107,9 +107,6 @@ public struct SUISwipeToPopModifier: ViewModifier {
             // ЗАПОМИНАЕМ ТЕКУЩУЮ ПОЗИЦИЮ КАК СТАРТОВУЮ!
             activationPoint = translation
             
-            // Инициализируем предыдущий экран
-            previousVM.setOpacityDirectly(1.0)
-            
             if config.directions.count == 1 {
                 previousVM.setOffsetDirectly(calculateInitialOffset(for: dir))
             } else {
@@ -130,6 +127,11 @@ public struct SUISwipeToPopModifier: ViewModifier {
         let rawOffset = convertToCGPoint(translation: relativeTranslation, axis: axis)
         let safeOffset = clampOffset(rawOffset, direction: dir)
         
+        // НОВОЕ: Вычисляем прогресс на основе сдвига
+        let maxDistance = axis == .horizontal ? bounds.width : bounds.height
+        let currentDistance = axis == .horizontal ? abs(safeOffset.x) : abs(safeOffset.y)
+        
+        previousVM.setVisibilityDirectly(currentDistance / maxDistance)
         currentVM.setOffsetDirectly(safeOffset)
         
         if config.directions.count == 1 {
@@ -265,9 +267,14 @@ public struct SUISwipeToPopModifier: ViewModifier {
         withAnimation(.easeOut(duration: 0.25)) {
             currentVM.setOffsetDirectly(finalOffset)
             previousVM.setOffsetDirectly(.zero)
+            
+            // НОВОЕ: Убираем прогресс у текущего, возвращаем 1.0 предыдущему
+            previousVM.setVisibilityDirectly(1.0)
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [navigator] in
+            currentVM.setStateDirectly(SUIScreenState.onDisappeared)
+            previousVM.setStateDirectly(SUIScreenState.onAppeared)
             navigator.popScreenSilently()
         }
     }
@@ -282,10 +289,7 @@ public struct SUISwipeToPopModifier: ViewModifier {
         withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
             currentVM.setOffsetDirectly(.zero)
             previousVM.setOffsetDirectly(targetPrevOffset)
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
-            previousVM.setOpacityDirectly(0)
+            previousVM.setVisibilityDirectly(1.0)
         }
     }
 }
