@@ -34,5 +34,3 @@ public struct ScreenView<Content: View, ViewModel: SUIScreenStateViewModel>: Vie
             ))
     }
 }
-
-

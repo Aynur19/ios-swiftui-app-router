@@ -48,6 +48,7 @@ public struct SUINavigationContainerView<Controller: SUIAppNavigator>: View {
             let baseView = ScreenView(viewModel: viewModel) {
                 navigator.screenView(for: screen)
                     .environment(\.screenTransitionState, viewModel.state)
+                    .environment(\.screenVisibilityProgress, viewModel.visibilityProgress)
             }
             
             // ПРОВЕРЯЕМ: Если это верхний экран и он поддерживает свайп

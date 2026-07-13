@@ -55,7 +55,7 @@ extension SUIScreenTransition {
     }
     
     public static func slide(
-        with animation: SUIAnimationDescriptor? = SUIAnimationDescriptor.easeOut(duration: 0.35),
+        with animation: SUIAnimationDescriptor? = SUIAnimationDescriptor.easeOut(duration: 0.5),
         from anchorStart: any SUIScreenAnchorProtocol,
         to anchorEnd: any SUIScreenAnchorProtocol,
         coef: CGFloat = 1,

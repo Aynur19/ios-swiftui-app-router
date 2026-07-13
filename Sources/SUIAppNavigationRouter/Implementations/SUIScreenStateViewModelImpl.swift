@@ -8,6 +8,8 @@ public final class SUIScreenStateViewModelImpl: SUIScreenStateViewModel {
         didSet { transition(from: oldValue, to: state) }
     }
     
+    @Published public private(set) var visibilityProgress: Double = 1.0
+    
     private var transition: SUIScreenTransition?
     private var currentAnimationCompletion: (() -> Void)?
 }
@@ -20,8 +22,12 @@ extension SUIScreenStateViewModelImpl {
         self.transitionState.offset = offset
     }
     
-    public func setOpacityDirectly(_ opacity: Double) {
-        self.transitionState.opacity = opacity
+    public func setVisibilityDirectly(_ visibility: Double) {
+        self.visibilityProgress = visibility
+    }
+    
+    public func setStateDirectly(_ state: SUIScreenState) {
+        self.state = state
     }
     
     // MARK: - Appear view
@@ -34,7 +40,7 @@ extension SUIScreenStateViewModelImpl {
         if let transition {
             updateParameters(parameters: transition.startParameters)
             
-            tryAnimate(transition: transition) { [weak self] in
+            tryAnimate(visibilityProgress: 1, transition: transition) { [weak self] in
                 self?.process(event: SUIScreenEvent.endAppearing)
             }
         }
@@ -54,7 +60,7 @@ extension SUIScreenStateViewModelImpl {
         if let transition {
             updateParameters(parameters: transition.startParameters)
             
-            tryAnimate(transition: transition) { [weak self] in
+            tryAnimate(visibilityProgress: 0, transition: transition) { [weak self] in
                 self?.process(event: SUIScreenEvent.endHolding)
             }
         }
@@ -108,6 +114,7 @@ extension SUIScreenStateViewModelImpl {
 @MainActor
 extension SUIScreenStateViewModelImpl {
     private func tryAnimate(
+        visibilityProgress: Double? = nil,
         transition: SUIScreenTransition?,
         completion: (() -> Void)? = nil
     ) {
@@ -117,7 +124,10 @@ extension SUIScreenStateViewModelImpl {
         }
         
         guard let animationDescriptor = transition.animation else {
-            updateParameters(parameters: transition.endParameters)
+            updateParameters(
+                visibilityProgress: visibilityProgress,
+                parameters: transition.endParameters
+            )
             completion?()
             return
         }
@@ -126,7 +136,10 @@ extension SUIScreenStateViewModelImpl {
         currentAnimationCompletion = completion
         
         withAnimation(animation) {
-            updateParameters(parameters: transition.endParameters)
+            updateParameters(
+                visibilityProgress: visibilityProgress,
+                parameters: transition.endParameters
+            )
         }
         
         let duration = animationDescriptor.totalDuration + 0.1
@@ -137,7 +150,10 @@ extension SUIScreenStateViewModelImpl {
         }
     }
     
-    private func updateParameters(parameters: [SUITransitionParameter]) {
+    private func updateParameters(
+        visibilityProgress: Double? = nil,
+        parameters: [SUITransitionParameter]
+    ) {
         for parameter in parameters {
             switch parameter {
                 case let .opacity(value): transitionState.opacity = value
@@ -146,6 +162,10 @@ extension SUIScreenStateViewModelImpl {
                 case let .rotation(value): transitionState.rotation = value
                 case let .blur(value):    transitionState.blur = value
             }
+        }
+        
+        if let visibilityProgress {
+            self.visibilityProgress = visibilityProgress
         }
     }
 }
